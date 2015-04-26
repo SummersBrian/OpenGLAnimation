@@ -1,18 +1,3 @@
-/****************************************************************************
-**
-CMSC427 Spring 2015 Problem Set 2
-Brian Summers - 110656609
-summers.brian.cs@gmail.com
-3/5/2015
-
-Uses start code by:
-Window for OpenGL in QT.
-Start code for CMSC 427, Spring 2015
-Reference: cube & texture example in Qt Creator
-author: Zheng Xu, xuzhustc@gmail.com
-**
-****************************************************************************/
-
 #ifndef GLWidget_H
 #define GLWidget_H
 
