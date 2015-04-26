@@ -1,9 +1,33 @@
-#include "glwidget.h"
+/****************************************************************************
+**
+CMSC427 Spring 2015 Problem Set 2
+Brian Summers - 110656609
+summers.brian.cs@gmail.com
+3/5/2015
 
-GLWidget::GLWidget(QWidget *parent) :
-    QOpenGLWidget(parent)
+
+Uses Start code by:
+Window for OpenGL in QT.
+Start code for CMSC 427, Spring 2015
+Reference: cube & texture example in Qt Creator
+author: Zheng Xu, xuzhustc@gmail.com
+**
+****************************************************************************/
+
+#include "GLWidget.h"
+
+GLWidget::GLWidget(QWidget *parent)
+    : QOpenGLWidget(parent)
 {
+    cubNum = 0;
 
+    setFocusPolicy(Qt::StrongFocus);
+
+    //transformation variables
+    rot_radians = 3.14f/36.0f;
+    automove = false;
+    move_speed = 0.03f;
+    rot_count = 0;
 }
 
 GLWidget::~GLWidget()
@@ -12,59 +36,47 @@ GLWidget::~GLWidget()
     vbo.destroy();
     delete program;
     doneCurrent();
-
 }
 
-void GLWidget::initializeGL() {
+void GLWidget::initializeGL()
+{
     initializeOpenGLFunctions();
 
+    // Enable depth buffer
     glEnable(GL_DEPTH_TEST);
+    // Enable back face culling
     glEnable(GL_CULL_FACE);
 
-    clearScreenColor.setRgbF(0.1,0.1,0.1,0.0);
+    clearColor.setRgbF(0.1, 0.1, 0.1, 1.0);
+
     vao.create();
     vao.bind();
-    loadLeg();
-    initMat();
-    initShaders();
-}
 
-void GLWidget::initMat() {
-    QMatrix4x4 proj;
-    QMatrix4x4 view;
-    proj.ortho(0.0f,50.0f,0.0f,50.0f,0.0f,2.0f);
-    view.lookAt(QVector3D(0.0f, 0.0, 0.0f), QVector3D(0.0f, 0.0f, 1.0f), QVector3D(0.0f, 1.0f, 0.0f));
-    mvpMat = proj * view;
+    initShaders();
+    loadShapes();
 }
 
 void GLWidget::initShaders()
 {
 #define PROGRAM_VERTEX_ATTRIBUTE 0
-#define PROGRAM_TEXCOORD_ATTRIBUTE 1
 
     QOpenGLShader *vshader = new QOpenGLShader(QOpenGLShader::Vertex, this);
     const char *vsrc =
             "#version 330\n"
             "layout (location = 0) in vec4 vertex;\n"
-            "layout (location = 1) in vec4 texCoord;\n"
-            "uniform mat4 matrix;\n"
-            "out vec4 tCd;\n"
             "void main(void)\n"
             "{\n"
-            "   gl_Position = matrix * vertex;\n"
-            "   tCd = texCoord;\n"
+            "   gl_Position = vertex;\n"
             "}\n";
     vshader->compileSourceCode(vsrc);
 
     QOpenGLShader *fshader = new QOpenGLShader(QOpenGLShader::Fragment, this);
     const char *fsrc =
             "#version 330\n"
-            "uniform sampler2D fTexture;\n"
-            "in vec4 tCd;\n"
-            "out vec4 ffColor;\n"
+            "out vec3 color;\n"
             "void main(void)\n"
             "{\n"
-            "   ffColor = texture(fTexture, tCd.st);\n"
+            "   color = vec3(1.0,0.0,0.0);\n"
             "}\n";
     fshader->compileSourceCode(fsrc);
 
@@ -72,40 +84,51 @@ void GLWidget::initShaders()
     program->addShader(vshader);
     program->addShader(fshader);
     program->bindAttributeLocation("vertex", PROGRAM_VERTEX_ATTRIBUTE);
-    program->bindAttributeLocation("texCoord", PROGRAM_TEXCOORD_ATTRIBUTE);
     program->link();
 
     program->bind();
-    program->setUniformValue("fTexture", 0);
 }
 
-
-
-void GLWidget::resizeGL(int w, int h)
+void GLWidget::loadShapes()
 {
-    int side = qMin(w, h);
-    glViewport((w - side) / 2, (h - side) / 2, side, side);
+    static const GLfloat g_vertex_buffer_data[3][3] = {
+        {-1.0f, -1.0f, 0.0f},
+        {1.0f, -1.0f, 0.0f},
+        {0.0f,  1.0f, 0.0f}
+    };
+    GLfloat coords[3][3];
+    scaleShapes(g_vertex_buffer_data, coords,0.25f);
+
+    vbo.create();
+    vbo.bind();
+    vbo.allocate(coords, sizeof(coords));
+}
+
+void GLWidget::scaleShapes(const GLfloat coords[3][3], GLfloat (&returnCoords)[3][3], float scale){
+    for (int i = 0; i < 3; i++) {
+            returnCoords[i][0] = coords[i][0] * scale;
+            returnCoords[i][1] = coords[i][1] * scale;
+            returnCoords[i][2] = coords[i][2] * scale;
+    }
 }
 
 void GLWidget::paintGL()
 {
     //background
-    glClearColor(clearScreenColor.redF(), clearScreenColor.greenF(), clearScreenColor.blueF(), clearScreenColor.alphaF());
+    glClearColor(clearColor.redF(), clearColor.greenF(), clearColor.blueF(), clearColor.alphaF());
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    program->setUniformValue("matrix", mvpMat);
     program->enableAttributeArray(PROGRAM_VERTEX_ATTRIBUTE);
-    program->setAttributeBuffer(PROGRAM_VERTEX_ATTRIBUTE, GL_FLOAT, 0, 3, 5 * sizeof(GLfloat));
-    program->enableAttributeArray(PROGRAM_TEXCOORD_ATTRIBUTE);
-    program->setAttributeBuffer(PROGRAM_TEXCOORD_ATTRIBUTE, GL_FLOAT, 3 * sizeof(GLfloat), 2, 5 * sizeof(GLfloat));
+    program->setAttributeBuffer(PROGRAM_VERTEX_ATTRIBUTE, GL_FLOAT, 0, 3, 3 * sizeof(GLfloat));
 
-    for (int i = 0; i < 1; ++i) {
-        //textures[i]->bind();
-        glDrawArrays(GL_TRIANGLE_FAN, i * 4, 4);
-    }
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 
 }
 
-void loadLeg() {
-
+void GLWidget::resizeGL(int width, int height)
+{
+    int side = qMin(width, height);
+    glViewport((width - side) / 2, (height - side) / 2, side, side);
 }
+
+
