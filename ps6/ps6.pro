@@ -1,10 +1,10 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2015-04-23T09:30:09
+# Project created by QtCreator 2015-04-23T19:58:39
 #
 #-------------------------------------------------
 
-QT       += core gui opengl
+QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -16,5 +16,3 @@ SOURCES += main.cpp\
         glwidget.cpp
 
 HEADERS  += glwidget.h
-
-FORMS    += glwidget.ui
