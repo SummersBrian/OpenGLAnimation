@@ -1,0 +1,23 @@
+#include "bone.h"
+
+Bone::Bone(float length) {
+    parent = null;
+    v1 = QVector2D(0,0);
+    v2 = QVector2D(length,0);
+}
+
+Bone::Bone(Bone *parent) {
+    this->parent = parent;
+    v1 = parent->getV2();
+    v2 = parent->getV2();
+}
+
+Bone::setV1(float x, float y) {
+    v1.x = x;
+    v1.y = y;
+}
+
+Bone::setV2(float x, float y) {
+    v2.x = x;
+    v2.y = y;
+}

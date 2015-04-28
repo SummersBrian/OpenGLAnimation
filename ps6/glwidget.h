@@ -1,6 +1,9 @@
 #ifndef GLWidget_H
 #define GLWidget_H
 
+#include "body.h"
+#include "limb.h"
+
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 #include <QOpenGLShaderProgram>
@@ -28,8 +31,10 @@ protected:
     void initShaders();
 
 private:
-    void loadShapes();
-    void scaleShapes(const GLfloat coords[3][3], GLfloat (&returnCoords)[3][3], float scale);
+    void loadBody();
+    void moveLimb(const float coords[4][3], float (&returnCoords)[4][3], float x, float y, float z, float scale);
+    Limb* addLimb(float coords[4][3]);
+    Limb* addLimbAtJoint(Limb* parent, float coords[4][3], float jointX, float jointY);
 
     QColor clearColor;
     QOpenGLShaderProgram *program;
@@ -38,17 +43,9 @@ private:
     QMatrix4x4 proj;
     QMatrix4x4 view;
     QMatrix4x4 model;
-    QTimer *timer, *timer2;
+    int shapeNum;
+    Body body;
 
-    float move_speed;
-    float rot_radians;
-    int rot_count;
-    int cubNum;
-    bool automove;
-    QString txtPath;
-
-#define RESOURCE_FLAG true
-#define TXT_IMG_PATH "C:/Users/Zheng/Documents/openglTest/images"
 #define CUBE_NUM 1
 };
 

@@ -1,17 +1,12 @@
-#include "GLWidget.h"
+#include "glwidget.h"
 
 GLWidget::GLWidget(QWidget *parent)
     : QOpenGLWidget(parent)
 {
-    cubNum = 0;
+    shapeNum = 0;
 
     setFocusPolicy(Qt::StrongFocus);
-
-    //transformation variables
-    rot_radians = 3.14f/36.0f;
-    automove = false;
-    move_speed = 0.03f;
-    rot_count = 0;
+    body = Body();
 }
 
 GLWidget::~GLWidget()
@@ -37,7 +32,7 @@ void GLWidget::initializeGL()
     vao.bind();
 
     initShaders();
-    loadShapes();
+    loadBody();
 }
 
 void GLWidget::initShaders()
@@ -69,30 +64,53 @@ void GLWidget::initShaders()
     program->addShader(fshader);
     program->bindAttributeLocation("vertex", PROGRAM_VERTEX_ATTRIBUTE);
     program->link();
-
     program->bind();
 }
 
-void GLWidget::loadShapes()
+void GLWidget::loadBody()
 {
-    static const GLfloat g_vertex_buffer_data[3][3] = {
-        {-1.0f, -1.0f, 0.0f},
-        {1.0f, -1.0f, 0.0f},
-        {0.0f,  1.0f, 0.0f}
+    static const float g_vertex_buffer_data[4][3] = {
+        {-1.0f, -1.0f, 0.0f}, //bot left
+        {-1.0f, 1.0f, 0.0f}, //top left
+        {1.0f, -1.0f, 0.0f}, //bot right
+        {1.0f,  1.0f, 0.0f} //top right
     };
-    GLfloat coords[3][3];
-    scaleShapes(g_vertex_buffer_data, coords,0.25f);
-
+    float coords[4][3];
+    Limb* limb;
+    moveLimb(g_vertex_buffer_data, coords, -1.0f, -1.0f, 0.0f, 0.10f);
+    shapeNum++;
+    limb = addLimb(coords);
     vbo.create();
     vbo.bind();
     vbo.allocate(coords, sizeof(coords));
 }
 
-void GLWidget::scaleShapes(const GLfloat coords[3][3], GLfloat (&returnCoords)[3][3], float scale){
-    for (int i = 0; i < 3; i++) {
-            returnCoords[i][0] = coords[i][0] * scale;
-            returnCoords[i][1] = coords[i][1] * scale;
-            returnCoords[i][2] = coords[i][2] * scale;
+Limb* GLWidget::addLimb(float coords[4][3]) {
+    Limb* l = new Limb();
+    l->setV1(coords[0][0], coords[0][1]);
+    l->setV2(coords[1][0], coords[1][1]);
+    l->setV3(coords[2][0], coords[2][1]);
+    l->setV4(coords[3][0], coords[3][1]);
+    body.addLimb(*l);
+    return l;
+}
+
+Limb* GLWidget::addLimbAtJoint(Limb* parent, float coords[4][3], float jointX, float jointY) {
+    Limb* l = new Limb();
+
+    if (parent->jointSide(jointX, jointY) != Limb::Joint_Side::NON_JOINT) {
+
+
+    } else {
+        return NULL;
+    }
+}
+
+void GLWidget::moveLimb(const float coords[4][3], float (&returnCoords)[4][3], float x, float y, float z, float scale){
+    for (int i = 0; i < 4; i++) {
+        returnCoords[i][0] = (coords[i][0]+x) * scale;
+        returnCoords[i][1] = (coords[i][1]+y) * scale;
+        returnCoords[i][2] = (coords[i][2]+z) * scale;
     }
 }
 
@@ -105,7 +123,7 @@ void GLWidget::paintGL()
     program->enableAttributeArray(PROGRAM_VERTEX_ATTRIBUTE);
     program->setAttributeBuffer(PROGRAM_VERTEX_ATTRIBUTE, GL_FLOAT, 0, 3, 3 * sizeof(GLfloat));
 
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, shapeNum * 4);
 
 }
 
