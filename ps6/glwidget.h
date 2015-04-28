@@ -34,7 +34,7 @@ private:
     void loadBody();
     void moveLimb(const float coords[4][3], float (&returnCoords)[4][3], float x, float y, float z, float scale);
     Limb* addLimb(float coords[4][3]);
-    Limb* addLimbAtJoint(Limb* parent, float coords[4][3], float jointX, float jointY);
+    Limb* addLimbAtJoint(Limb* parent, float jointX, float jointY, float scaleX, float scaleY);
 
     QColor clearColor;
     QOpenGLShaderProgram *program;
@@ -43,7 +43,7 @@ private:
     QMatrix4x4 proj;
     QMatrix4x4 view;
     QMatrix4x4 model;
-    int shapeNum;
+    int limbNum;
     Body body;
 
 #define CUBE_NUM 1

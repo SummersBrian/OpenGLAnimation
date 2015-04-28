@@ -51,6 +51,30 @@ void Limb::setJoint(float x, float y) {
     this->joint = QVector2D(x,y);
 }
 
+void Limb::setParent(Limb *parent) {
+    this->parent = parent;
+}
+
+void Limb::setV1(QVector2D v) {
+    v1.setX(v.x());
+    v1.setY(v.y());
+}
+
+void Limb::setV2(QVector2D v) {
+    v2.setX(v.x());
+    v2.setY(v.y());
+}
+
+void Limb::setV3(QVector2D v) {
+    v3.setX(v.x());
+    v3.setY(v.y());
+}
+
+void Limb::setV4(QVector2D v) {
+    v4.setX(v.x());
+    v4.setY(v.y());
+}
+
 QVector2D Limb::getV1() {
     return v1;
 }
@@ -69,19 +93,19 @@ QVector2D Limb::getV4() {
 
 Limb::Joint_Side Limb::jointSide(float x, float y) {
     if (v1.x() == x && v2.x() == x) {
-        if (y == ((v2.y() - v1.y()) / 2.0f)) {
+        if (y == ((v2.y() - v1.y()) / 2.0f) + v1.y()) {
             return LEFT;
         }
     } else if (v3.x() == x && v4.x() == x) {
-        if (y == ((v2.y() - v1.y()) / 2.0f)) {
+        if (y == ((v4.y() - v3.y()) / 2.0f) + v3.y()) {
             return RIGHT;
         }
     } else if (v1.y() == y && v3.y() == y) {
-        if (x == ((v4.x() - v2.y()) / 2.0f)) {
+        if (x == ((v3.x() - v1.y()) / 2.0f) + v1.x()) {
             return BOTTOM;
         }
     } else if (v2.y() == y && v4.y() == y) {
-        if (x == ((v4.x() - v2.y()) / 2.0f)) {
+        if (x == ((v4.x() - v2.y()) / 2.0f) + v2.x()) {
             return TOP;
         }
     }

@@ -3,7 +3,7 @@
 GLWidget::GLWidget(QWidget *parent)
     : QOpenGLWidget(parent)
 {
-    shapeNum = 0;
+    limbNum = 0;
 
     setFocusPolicy(Qt::StrongFocus);
     body = Body();
@@ -30,7 +30,7 @@ void GLWidget::initializeGL()
 
     vao.create();
     vao.bind();
-
+    glOrtho(-1.0,1.0,-1.0,1.0,-1.0,1.0);
     initShaders();
     loadBody();
 }
@@ -70,18 +70,20 @@ void GLWidget::initShaders()
 void GLWidget::loadBody()
 {
     static const float g_vertex_buffer_data[4][3] = {
-        {-1.0f, -1.0f, 0.0f}, //bot left
-        {-1.0f, 1.0f, 0.0f}, //top left
-        {1.0f, -1.0f, 0.0f}, //bot right
-        {1.0f,  1.0f, 0.0f} //top right
+        {-0.1f, -0.1f, 0.0f}, //bot left
+        {-0.1f, 0.1f, 0.0f}, //top left
+        {0.1f, -0.1f, 0.0f}, //bot right
+        {0.1f,  0.1f, 0.0f} //top right
     };
     float coords[4][3];
     Limb* limb;
-    moveLimb(g_vertex_buffer_data, coords, -1.0f, -1.0f, 0.0f, 0.10f);
-    shapeNum++;
-    limb = addLimb(coords);
+    //moveLimb(g_vertex_buffer_data, coords, 0.0f, 0.0f, 0.0f, 0.10f);
+    limbNum++;
+    //limb = addLimb(coords);
+    //limb = addLimbAtJoint(limb, 0.1f, 0.0f, 0.1f, 0.1f);
     vbo.create();
     vbo.bind();
+    //vbo.allocate(body.getLimbVertices().constData(), body.getCount() * sizeof(float));
     vbo.allocate(coords, sizeof(coords));
 }
 
@@ -92,15 +94,40 @@ Limb* GLWidget::addLimb(float coords[4][3]) {
     l->setV3(coords[2][0], coords[2][1]);
     l->setV4(coords[3][0], coords[3][1]);
     body.addLimb(*l);
+    limbNum++;
     return l;
 }
 
-Limb* GLWidget::addLimbAtJoint(Limb* parent, float coords[4][3], float jointX, float jointY) {
+Limb* GLWidget::addLimbAtJoint(Limb* parent, float jointX, float jointY, float scaleX, float scaleY) {
     Limb* l = new Limb();
-
-    if (parent->jointSide(jointX, jointY) != Limb::Joint_Side::NON_JOINT) {
-
-
+    Limb::Joint_Side js = parent->jointSide(jointX, jointY);
+    if (js != Limb::Joint_Side::NON_JOINT) {
+        l->setParent(parent);
+        l->setJoint(jointX, jointY);
+        if (js == Limb::Joint_Side::LEFT) {
+            l->setV3(parent->getV1());
+            l->setV4(parent->getV2());
+            l->setV1((parent->getV1()) - QVector2D(scaleX,0));
+            l->setV2((parent->getV2()) - QVector2D(scaleX,0));
+        } else if (js ==  Limb::Joint_Side::RIGHT) {
+            l->setV1(parent->getV3());
+            l->setV2(parent->getV4());
+            l->setV3((parent->getV3()) + QVector2D(scaleX,0));
+            l->setV4((parent->getV4()) + QVector2D(scaleX,0));
+        } else if (js == Limb::Joint_Side::BOTTOM) {
+            l->setV2(parent->getV1());
+            l->setV4(parent->getV3());
+            l->setV1((parent->getV1()) - QVector2D(0,scaleY));
+            l->setV3((parent->getV3()) - QVector2D(0,scaleY));
+        } else {
+            l->setV1(parent->getV2());
+            l->setV3(parent->getV4());
+            l->setV2((parent->getV2()) + QVector2D(0,scaleY));
+            l->setV4((parent->getV4()) + QVector2D(0,scaleY));
+        }
+        limbNum++;
+        body.addLimb(*l);
+        return l;
     } else {
         return NULL;
     }
@@ -121,16 +148,18 @@ void GLWidget::paintGL()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     program->enableAttributeArray(PROGRAM_VERTEX_ATTRIBUTE);
-    program->setAttributeBuffer(PROGRAM_VERTEX_ATTRIBUTE, GL_FLOAT, 0, 3, 3 * sizeof(GLfloat));
+    program->setAttributeBuffer(PROGRAM_VERTEX_ATTRIBUTE, GL_FLOAT, 0, 3, 3 * sizeof(float));
 
-    glDrawArrays(GL_TRIANGLE_FAN, 0, shapeNum * 4);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, limbNum * 4);
 
 }
 
 void GLWidget::resizeGL(int width, int height)
 {
     int side = qMin(width, height);
-    glViewport((width - side) / 2, (height - side) / 2, side, side);
+    //glViewport((width - side) / 2, (height - side) / 2, side, side);
+    glViewport(0,0,width,height);
+    glOrtho(-1.0,1.0,-1.0,1.0,-1.0,1.0);
 }
 
 

@@ -13,7 +13,12 @@ public:
     void setV2(float x, float y);
     void setV3(float x, float y);
     void setV4(float x, float y);
+    void setV1(QVector2D v);
+    void setV2(QVector2D v);
+    void setV3(QVector2D v);
+    void setV4(QVector2D v);
     void setJoint(float x, float y);
+    void setParent(Limb* parent);
     QVector2D getV1();
     QVector2D getV2();
     QVector2D getV3();
