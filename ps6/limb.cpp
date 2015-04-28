@@ -92,20 +92,20 @@ QVector2D Limb::getV4() {
 }
 
 Limb::Joint_Side Limb::jointSide(float x, float y) {
-    if (v1.x() == x && v2.x() == x) {
-        if (y == ((v2.y() - v1.y()) / 2.0f) + v1.y()) {
+    if (v1.x() == x && v4.x() == x) {
+        if (y == ((v4.y() - v1.y()) / 2.0f) + v1.y()) {
             return LEFT;
         }
-    } else if (v3.x() == x && v4.x() == x) {
-        if (y == ((v4.y() - v3.y()) / 2.0f) + v3.y()) {
+    } else if (v2.x() == x && v3.x() == x) {
+        if (y == ((v3.y() - v2.y()) / 2.0f) + v2.y()) {
             return RIGHT;
         }
-    } else if (v1.y() == y && v3.y() == y) {
-        if (x == ((v3.x() - v1.y()) / 2.0f) + v1.x()) {
+    } else if (v1.y() == y && v2.y() == y) {
+        if (x == ((v2.x() - v1.x()) / 2.0f) + v1.x()) {
             return BOTTOM;
         }
-    } else if (v2.y() == y && v4.y() == y) {
-        if (x == ((v4.x() - v2.y()) / 2.0f) + v2.x()) {
+    } else if (v3.y() == y && v4.y() == y) {
+        if (x == ((v3.x() - v4.x()) / 2.0f) + v4.x()) {
             return TOP;
         }
     }
