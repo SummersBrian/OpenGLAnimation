@@ -30,7 +30,7 @@ void GLWidget::initializeGL()
 
     vao.create();
     vao.bind();
-    glOrtho(-1.0,1.0,-1.0,1.0,-1.0,1.0);
+    //glOrtho(-1.0,1.0,-1.0,1.0,-1.0,1.0);
     initShaders();
     loadBody();
 }
@@ -69,22 +69,23 @@ void GLWidget::initShaders()
 
 void GLWidget::loadBody()
 {
-    static const float g_vertex_buffer_data[4][3] = {
-        {-0.1f, -0.1f, 0.0f}, //bot left
-        {-0.1f, 0.1f, 0.0f}, //top left
-        {0.1f, -0.1f, 0.0f}, //bot right
-        {0.1f,  0.1f, 0.0f} //top right
+    //must specify vertices in a cyclic order to obtain convex polygon
+    static const GLfloat g_vertex_buffer_data[4][3]= {
+        {-1.0f, -1.0f, 0.0f}, //bot left
+        {1.0f,-1.0f, 0.0f}, //bot right
+        {1.0f,1.0f,0.0f},
+        {-1.0f,1.0f, 0.0f},
     };
     float coords[4][3];
-    Limb* limb;
-    //moveLimb(g_vertex_buffer_data, coords, 0.0f, 0.0f, 0.0f, 0.10f);
+    //Limb* limb;
+    //moveLimb(g_vertex_buffer_data, coords, 0.0f, 0.0f, 0.0f, 0.50f);
     limbNum++;
     //limb = addLimb(coords);
     //limb = addLimbAtJoint(limb, 0.1f, 0.0f, 0.1f, 0.1f);
     vbo.create();
     vbo.bind();
     //vbo.allocate(body.getLimbVertices().constData(), body.getCount() * sizeof(float));
-    vbo.allocate(coords, sizeof(coords));
+    vbo.allocate(g_vertex_buffer_data, sizeof(g_vertex_buffer_data));
 }
 
 Limb* GLWidget::addLimb(float coords[4][3]) {
@@ -148,18 +149,17 @@ void GLWidget::paintGL()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     program->enableAttributeArray(PROGRAM_VERTEX_ATTRIBUTE);
-    program->setAttributeBuffer(PROGRAM_VERTEX_ATTRIBUTE, GL_FLOAT, 0, 3, 3 * sizeof(float));
+    program->setAttributeBuffer(PROGRAM_VERTEX_ATTRIBUTE, GL_FLOAT, 0, 3, 0);
 
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, limbNum * 4);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
 }
 
 void GLWidget::resizeGL(int width, int height)
 {
     int side = qMin(width, height);
-    //glViewport((width - side) / 2, (height - side) / 2, side, side);
-    glViewport(0,0,width,height);
-    glOrtho(-1.0,1.0,-1.0,1.0,-1.0,1.0);
+    glViewport((width - side) / 2, (height - side) / 2, side, side);
+    //glOrtho(-1.0,1.0,-1.0,1.0,-1.0,1.0);
 }
 
 
