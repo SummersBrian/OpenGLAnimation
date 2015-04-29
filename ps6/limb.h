@@ -23,8 +23,11 @@ public:
     QVector2D getV2();
     QVector2D getV3();
     QVector2D getV4();
+
     enum Joint_Side{LEFT, RIGHT, TOP, BOTTOM, NON_JOINT};
     Joint_Side jointSide(float x, float y);
+
+    void rotateLimbAboutJoint(float degree);
 
 private:
     QVector2D v1;

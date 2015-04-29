@@ -17,6 +17,9 @@ private:
     QVector<Limb> limbs;
     QVector<float> limbVertices;
     int count;
+
+    void appendLimb(Limb limb);
+    void prependLimb(Limb limb);
 };
 
 #endif // BODY_H

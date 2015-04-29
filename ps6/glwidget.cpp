@@ -51,10 +51,11 @@ void GLWidget::initShaders()
     QOpenGLShader *fshader = new QOpenGLShader(QOpenGLShader::Fragment, this);
     const char *fsrc =
             "#version 330\n"
+            "uniform vec3 m_color;\n"
             "out vec3 color;\n"
             "void main(void)\n"
             "{\n"
-            "   color = vec3(1.0,0.0,0.0);\n"
+            "   color = m_color;\n"
             "}\n";
     fshader->compileSourceCode(fsrc);
 
@@ -76,11 +77,12 @@ void GLWidget::loadBody()
         {-1.0f,1.0f, 0.0f} //top left v4
     };
     float coords[4][3];
-    Limb* limb;
+    Limb* torso;
+    Limb* legs[2];
     moveLimb(g_vertex_buffer_data, coords, 0.0f, 0.0f, 0.0f, 0.10f);
-    //limbNum++;
-    limb = addLimb(coords);
-    limb = addLimbAtJoint(limb, 0.0f, -0.1f, 0.1f, 0.5f);
+    torso = addLimb(coords);
+    legs[0] = addLimbAtJoint(torso, 0.0f, -0.1f, 0.075f, 0.5f);
+    legs[0]->rotateLimbAboutJoint(M_PI/16.0f);
     vbo.create();
     vbo.bind();
     vbo.allocate(body.getLimbVertices().constData(), body.getCount() * sizeof(float));
@@ -100,30 +102,35 @@ Limb* GLWidget::addLimb(float coords[4][3]) {
 
 Limb* GLWidget::addLimbAtJoint(Limb* parent, float jointX, float jointY, float scaleX, float scaleY) {
     Limb* l = new Limb();
+    float scaleDiff;
     Limb::Joint_Side js = parent->jointSide(jointX, jointY);
     if (js != Limb::Joint_Side::NON_JOINT) {
         l->setParent(parent);
         l->setJoint(jointX, jointY);
         if (js == Limb::Joint_Side::LEFT) {
-            l->setV2(parent->getV1());
-            l->setV3(parent->getV4());
-            l->setV1((parent->getV1()) - QVector2D(scaleX,0));
-            l->setV4((parent->getV4()) - QVector2D(scaleX,0));
+            scaleDiff = (parent->getV4().y() - parent->getV1().y()) - scaleY;
+            l->setV2(parent->getV1() + QVector2D(0.0f, scaleDiff/2.0f));
+            l->setV3(parent->getV4() - QVector2D(0.0f, scaleDiff/2.0f));
+            l->setV1((parent->getV1() + QVector2D(0.0f, scaleDiff/2.0f)) - QVector2D(scaleX,0));
+            l->setV4((parent->getV4() - QVector2D(0.0f, scaleDiff/2.0f)) - QVector2D(scaleX,0));
         } else if (js ==  Limb::Joint_Side::RIGHT) {
-            l->setV1(parent->getV2());
-            l->setV4(parent->getV3());
-            l->setV2((parent->getV2()) + QVector2D(scaleX,0));
-            l->setV3((parent->getV3()) + QVector2D(scaleX,0));
+            scaleDiff = (parent->getV3().y() - parent->getV2().y()) - scaleY;
+            l->setV1(parent->getV2() + QVector2D(0.0f, scaleDiff/2.0f));
+            l->setV4(parent->getV3() - QVector2D(0.0f, scaleDiff/2.0f));
+            l->setV2((parent->getV2() + QVector2D(0.0f, scaleDiff/2.0f)) + QVector2D(scaleX,0));
+            l->setV3((parent->getV3() - QVector2D(0.0f, scaleDiff/2.0f)) + QVector2D(scaleX,0));
         } else if (js == Limb::Joint_Side::BOTTOM) {
-            l->setV4(parent->getV1());
-            l->setV3(parent->getV2());
-            l->setV1((parent->getV1()) - QVector2D(0,scaleY));
-            l->setV2((parent->getV2()) - QVector2D(0,scaleY));
+            scaleDiff = (parent->getV2().x() - parent->getV1().x()) - scaleX;
+            l->setV4(parent->getV1() + QVector2D(scaleDiff/2.0f, 0.0f));
+            l->setV3(parent->getV2() - QVector2D(scaleDiff/2.0f, 0.0f));
+            l->setV1((parent->getV1() + QVector2D(scaleDiff/2.0f, 0.0f)) - QVector2D(0,scaleY));
+            l->setV2((parent->getV2() - QVector2D(scaleDiff/2.0f, 0.0f)) - QVector2D(0,scaleY));
         } else {
-            l->setV1(parent->getV4());
-            l->setV2(parent->getV3());
-            l->setV4((parent->getV4()) + QVector2D(0,scaleY));
-            l->setV3((parent->getV3()) + QVector2D(0,scaleY));
+            scaleDiff = (parent->getV3().x() - parent->getV4().x()) - scaleX;
+            l->setV1(parent->getV4() + QVector2D(scaleDiff/2.0f, 0.0f));
+            l->setV2(parent->getV3() - QVector2D(scaleDiff/2.0f, 0.0f));
+            l->setV4((parent->getV4() + QVector2D(scaleDiff/2.0f, 0.0f)) + QVector2D(0,scaleY));
+            l->setV3((parent->getV3() - QVector2D(scaleDiff/2.0f, 0.0f)) + QVector2D(0,scaleY));
         }
         body.addLimb(*l);
         limbNum++;
@@ -150,7 +157,16 @@ void GLWidget::paintGL()
     program->enableAttributeArray(PROGRAM_VERTEX_ATTRIBUTE);
     program->setAttributeBuffer(PROGRAM_VERTEX_ATTRIBUTE, GL_FLOAT, 0, 3, 0);
 
-    glDrawArrays(GL_TRIANGLES, 0, limbNum * 6 * 3);
+    QVector3D color[3] = {
+        QVector3D(0.3f,0.0f,0.0f),
+        QVector3D(0.0f,0.3f,0.0f),
+        QVector3D(0.0f,0.0f,0.3f)
+    };
+
+    for (int i = 0; i < limbNum; i++) {
+        program->setUniformValue("m_color", color[i]);
+        glDrawArrays(GL_TRIANGLES, i*6, 6);
+    }
 
 }
 
