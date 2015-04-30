@@ -4,6 +4,7 @@
 
 Limb::Limb() {
     parent = NULL;
+    child = NULL;
     //joint = NULL;
     v1 = QVector2D();
     v2 = QVector2D();
@@ -11,10 +12,13 @@ Limb::Limb() {
     v4 = QVector2D();
     curr_rot = 0.0f;
     rotation_direction = Rotation_Direction::CCW;
+    max_rot = M_PI/12.0f;
+    min_rot = -M_PI/12.0f;
 }
 
 Limb::Limb(Limb *parent, QVector2D joint, QVector2D jointV1, QVector2D jointV2) {
     this->parent = parent;
+    parent->child = this;
     this->joint = joint;
     v1 = QVector2D();
     v1.setX(jointV1.x());
@@ -58,6 +62,14 @@ void Limb::setJoint(float x, float y) {
 
 void Limb::setParent(Limb *parent) {
     this->parent = parent;
+}
+
+void Limb::setChild(Limb *child) {
+    this->child = child;
+}
+
+Limb* Limb::getChild() {
+    return child;
 }
 
 void Limb::setV1(QVector2D v) {
@@ -118,15 +130,14 @@ Limb::Joint_Side Limb::jointSide(float x, float y) {
 }
 
 void Limb::rotateLimbAboutJoint(float radians) {
-    if (curr_rot > max_rot) {
-        rotation_direction = Rotation_Direction::CW;
-    }
-    if (curr_rot < min_rot) {
-        rotation_direction = Rotation_Direction::CCW;
-    }
 
+    if (rotation_direction == Rotation_Direction::CCW) {
+        if ( (curr_rot + radians) > max_rot) {
+            radians = max_rot - curr_rot;
+        }
+    }
     if (rotation_direction == Rotation_Direction::CW) {
-        radians *= -1;
+       radians *= -1;
     }
 
     QVector2D vec1, vec2, vec3, vec4;
@@ -174,7 +185,73 @@ void Limb::rotateLimbAboutJoint(float radians) {
     v4.setY(vec4.y());
     v4 = v4 + joint;
 
+    if (child != NULL) {
+        child->rotateLimbAboutJoint(radians, joint);
+    }
+
     curr_rot += radians;
+}
+
+void Limb::rotateLimbAboutJoint(float radians, QVector2D joint) {
+
+    QVector2D vec1, vec2, vec3, vec4, vec5;
+    float x_prime, y_prime;
+
+    vec1 = v1 - joint;
+    vec2 = v2 - joint;
+    vec3 = v3 - joint;
+    vec4 = v4 - joint;
+    vec5 = this->joint - joint;
+
+    //x' = cos(theta) * x - sin(theta) * y; y' = sin(theta) * x + cos(theta) * y;
+    x_prime = qCos(radians) * vec1.x() - qSin(radians) * vec1.y();
+    y_prime = qSin(radians) * vec1.x() + qCos(radians) * vec1.y();
+    vec1.setX(x_prime);
+    vec1.setY(y_prime);
+
+    x_prime = qCos(radians) * vec2.x() - qSin(radians) * vec2.y();
+    y_prime = qSin(radians) * vec2.x() + qCos(radians) * vec2.y();
+    vec2.setX(x_prime);
+    vec2.setY(y_prime);
+
+    x_prime = qCos(radians) * vec3.x() - qSin(radians) * vec3.y();
+    y_prime = qSin(radians) * vec3.x() + qCos(radians) * vec3.y();
+    vec3.setX(x_prime);
+    vec3.setY(y_prime);
+
+    x_prime = qCos(radians) * vec4.x() - qSin(radians) * vec4.y();
+    y_prime = qSin(radians) * vec4.x() + qCos(radians) * vec4.y();
+    vec4.setX(x_prime);
+    vec4.setY(y_prime);
+
+    x_prime = qCos(radians) * vec5.x() - qSin(radians) * vec5.y();
+    y_prime = qSin(radians) * vec5.x() + qCos(radians) * vec5.y();
+    vec5.setX(x_prime);
+    vec5.setY(y_prime);
+
+    v1.setX(vec1.x());
+    v1.setY(vec1.y());
+    v1 = v1 + joint;
+
+    v2.setX(vec2.x());
+    v2.setY(vec2.y());
+    v2 = v2 + joint;
+
+    v3.setX(vec3.x());
+    v3.setY(vec3.y());
+    v3 = v3 + joint;
+
+    v4.setX(vec4.x());
+    v4.setY(vec4.y());
+    v4 = v4 + joint;
+
+    this->joint.setX(vec5.x());
+    this->joint.setY(vec5.y());
+    this->joint = this->joint + joint;
+
+    if (child != NULL) {
+        child->rotateLimbAboutJoint(radians, joint);
+    }
 }
 
 void Limb::setCurrRot(float radians) {
@@ -189,8 +266,16 @@ float Limb::getMaxRot() {
     return max_rot;
 }
 
+void Limb::setMaxRot(float radians) {
+    max_rot = radians;
+}
+
 float Limb::getMinRot() {
     return min_rot;
+}
+
+void Limb::setMinRot(float radians) {
+    min_rot = radians;
 }
 
 void Limb::setRotationDirection(Rotation_Direction rotation_direction) {

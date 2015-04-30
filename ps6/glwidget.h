@@ -23,6 +23,7 @@ class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 public:
     explicit GLWidget(QWidget *parent = 0);
     ~GLWidget();
+    enum Leg_Forward {LEFT,RIGHT};
 
 protected:
     void initializeGL() Q_DECL_OVERRIDE;
@@ -34,9 +35,13 @@ protected:
 private:
     void loadBody();
     void animate();
+    void legForward(Limb* leg);
+    void legBackward(Limb* leg);
+    void bendKnee(Limb* shin);
+    void straightenKnee(Limb* shin);
     void moveLimb(const float coords[4][3], float (&returnCoords)[4][3], float x, float y, float z, float scale);
     Limb* addLimb(float coords[4][3]);
-    Limb* addLimbAtJoint(Limb* parent, float jointX, float jointY, float scaleX, float scaleY);
+    Limb* addLimbAtJoint(Limb &parent, float jointX, float jointY, float scaleX, float scaleY);
 
     QColor clearColor;
     QOpenGLShaderProgram *program;
@@ -47,8 +52,8 @@ private:
     QMatrix4x4 model;
     int limbNum;
     Body body;
+    Leg_Forward forward_leg;
 
-#define CUBE_NUM 1
 };
 
 #endif  //GLWidget_h

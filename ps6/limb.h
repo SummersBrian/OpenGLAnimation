@@ -21,8 +21,11 @@ public:
     void setV4(QVector2D v);
     void setJoint(float x, float y);
     void setParent(Limb* parent);
+    void setChild(Limb* child);
     void setCurrRot(float radians);
     void setRotationDirection(Rotation_Direction rotation_direction);
+    void setMaxRot(float radians);
+    void setMinRot(float radians);
 
     QVector2D getV1();
     QVector2D getV2();
@@ -31,6 +34,7 @@ public:
     float getCurrRot();
     float getMaxRot();
     float getMinRot();
+    Limb* getChild();
     Limb::Rotation_Direction getRotationDirection();
 
 
@@ -38,6 +42,7 @@ public:
     Joint_Side jointSide(float x, float y);
 
     void rotateLimbAboutJoint(float radians);
+    void rotateLimbAboutJoint(float radians, QVector2D joint);
 
 private:
     QVector2D v1;
@@ -46,8 +51,9 @@ private:
     QVector2D v4;
     QVector2D joint;
     Limb* parent;
-    float max_rot = M_PI/8.0f;
-    float min_rot = -M_PI/8.0f;
+    Limb* child;
+    float max_rot;
+    float min_rot;
     float curr_rot;
     Rotation_Direction rotation_direction;
 
