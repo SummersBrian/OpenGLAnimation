@@ -31,7 +31,7 @@ void GLWidget::initializeGL()
     vao.create();
     vao.bind();
     initShaders();
-    animate();
+    loadBody();
 }
 
 void GLWidget::initShaders()
@@ -67,7 +67,7 @@ void GLWidget::initShaders()
     program->bind();
 }
 
-void GLWidget::animate()
+void GLWidget::loadBody()
 {
     //must specify vertices in a cyclic order to obtain convex polygon
     static const GLfloat g_vertex_buffer_data[6][3]= {
@@ -80,6 +80,8 @@ void GLWidget::animate()
     moveLimb(g_vertex_buffer_data, coords, 0.0f, 0.0f, 0.0f, 0.10f);
     addLimb(coords);
     addLimbAtJoint(body.getLimbAt(0), 0.0f, -0.1f, 0.075f, 0.5f);
+    addLimbAtJoint(body.getLimbAt(0), 0.0f, -0.1f, 0.075f, 0.5f);
+    body.getLimbAt(2)->setRotationDirection(Limb::Rotation_Direction::CW);
     QVector<float> vertices = body.getLimbVertices();
     vbo.create();
     vbo.bind();
@@ -87,9 +89,9 @@ void GLWidget::animate()
     //vbo.allocate(g_vertex_buffer_data, sizeof(g_vertex_buffer_data));
 }
 
-void GLWidget::rotateLimb() {
-    Limb* limb = body.getLimbAt(1);
-    limb->rotateLimbAboutJoint(M_PI/540.0f);
+void GLWidget::animate() {
+    body.getLimbAt(1)->rotateLimbAboutJoint(M_PI/540.0f);
+    body.getLimbAt(2)->rotateLimbAboutJoint(M_PI/540.0f);
     QVector<float> vertices = body.getLimbVertices();
     vbo.allocate(vertices.constData(), body.getVertexCount() * sizeof(float));
     update();
@@ -174,7 +176,7 @@ void GLWidget::paintGL()
         glDrawArrays(GL_TRIANGLES, i*6, 6);
     }
 
-    rotateLimb();
+    animate();
 }
 
 void GLWidget::resizeGL(int width, int height)

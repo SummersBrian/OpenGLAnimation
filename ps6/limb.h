@@ -10,6 +10,7 @@ public:
     Limb();
     Limb(Limb *parent, QVector2D joint, QVector2D jointV1, QVector2D jointV2);
     ~Limb();
+    enum Rotation_Direction {CW, CCW};
     void setV1(float x, float y);
     void setV2(float x, float y);
     void setV3(float x, float y);
@@ -21,12 +22,16 @@ public:
     void setJoint(float x, float y);
     void setParent(Limb* parent);
     void setCurrRot(float radians);
+    void setRotationDirection(Rotation_Direction rotation_direction);
 
     QVector2D getV1();
     QVector2D getV2();
     QVector2D getV3();
     QVector2D getV4();
     float getCurrRot();
+    float getMaxRot();
+    float getMinRot();
+    Limb::Rotation_Direction getRotationDirection();
 
 
     enum Joint_Side{LEFT, RIGHT, TOP, BOTTOM, NON_JOINT};
@@ -44,6 +49,7 @@ private:
     float max_rot = M_PI/8.0f;
     float min_rot = -M_PI/8.0f;
     float curr_rot;
+    Rotation_Direction rotation_direction;
 
 };
 

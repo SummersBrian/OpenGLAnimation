@@ -20,9 +20,6 @@ class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
     Q_OBJECT
 
-public slots:
-    void rotateLimb();
-
 public:
     explicit GLWidget(QWidget *parent = 0);
     ~GLWidget();
@@ -35,6 +32,7 @@ protected:
     void initShaders();
 
 private:
+    void loadBody();
     void animate();
     void moveLimb(const float coords[4][3], float (&returnCoords)[4][3], float x, float y, float z, float scale);
     Limb* addLimb(float coords[4][3]);
