@@ -2,6 +2,7 @@
 #define LIMB
 
 #include <QVector2D>
+#include <qmath.h>
 class Limb
 {
 
@@ -19,15 +20,19 @@ public:
     void setV4(QVector2D v);
     void setJoint(float x, float y);
     void setParent(Limb* parent);
+    void setCurrRot(float radians);
+
     QVector2D getV1();
     QVector2D getV2();
     QVector2D getV3();
     QVector2D getV4();
+    float getCurrRot();
+
 
     enum Joint_Side{LEFT, RIGHT, TOP, BOTTOM, NON_JOINT};
     Joint_Side jointSide(float x, float y);
 
-    void rotateLimbAboutJoint(float degree);
+    void rotateLimbAboutJoint(float radians);
 
 private:
     QVector2D v1;
@@ -36,6 +41,9 @@ private:
     QVector2D v4;
     QVector2D joint;
     Limb* parent;
+    float max_rot = M_PI/8.0f;
+    float min_rot = -M_PI/8.0f;
+    float curr_rot;
 
 };
 

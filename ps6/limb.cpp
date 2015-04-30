@@ -9,6 +9,7 @@ Limb::Limb() {
     v2 = QVector2D();
     v3 = QVector2D();
     v4 = QVector2D();
+    curr_rot = 0.0f;
 }
 
 Limb::Limb(Limb *parent, QVector2D joint, QVector2D jointV1, QVector2D jointV2) {
@@ -22,6 +23,7 @@ Limb::Limb(Limb *parent, QVector2D joint, QVector2D jointV1, QVector2D jointV2) 
     v2.setY(jointV2.y());
     v3 = QVector2D();
     v4 = QVector2D();
+    curr_rot = 0.0f;
 }
 
 Limb::~Limb(){
@@ -114,6 +116,9 @@ Limb::Joint_Side Limb::jointSide(float x, float y) {
 }
 
 void Limb::rotateLimbAboutJoint(float radians) {
+    if (curr_rot > max_rot || curr_rot < min_rot ) {
+        return;
+    }
     QVector2D vec1, vec2, vec3, vec4;
     float x_prime, y_prime;
 
@@ -158,4 +163,14 @@ void Limb::rotateLimbAboutJoint(float radians) {
     v4.setX(vec4.x());
     v4.setY(vec4.y());
     v4 = v4 + joint;
+
+    curr_rot += radians;
+}
+
+void Limb::setCurrRot(float radians) {
+    curr_rot = radians;
+}
+
+float Limb::getCurrRot() {
+    return curr_rot;
 }

@@ -14,10 +14,14 @@
 
 #include <QMatrix4x4>
 #include <QVector4D>
+#include <QTimer>
 
 class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
     Q_OBJECT
+
+public slots:
+    void rotateLimb();
 
 public:
     explicit GLWidget(QWidget *parent = 0);
@@ -31,7 +35,7 @@ protected:
     void initShaders();
 
 private:
-    void loadBody();
+    void animate();
     void moveLimb(const float coords[4][3], float (&returnCoords)[4][3], float x, float y, float z, float scale);
     Limb* addLimb(float coords[4][3]);
     Limb* addLimbAtJoint(Limb* parent, float jointX, float jointY, float scaleX, float scaleY);

@@ -31,7 +31,7 @@ void GLWidget::initializeGL()
     vao.create();
     vao.bind();
     initShaders();
-    loadBody();
+    animate();
 }
 
 void GLWidget::initShaders()
@@ -67,7 +67,7 @@ void GLWidget::initShaders()
     program->bind();
 }
 
-void GLWidget::loadBody()
+void GLWidget::animate()
 {
     //must specify vertices in a cyclic order to obtain convex polygon
     static const GLfloat g_vertex_buffer_data[6][3]= {
@@ -77,16 +77,22 @@ void GLWidget::loadBody()
         {-1.0f,1.0f, 0.0f} //top left v4
     };
     float coords[4][3];
-    Limb* torso;
-    Limb* legs[2];
     moveLimb(g_vertex_buffer_data, coords, 0.0f, 0.0f, 0.0f, 0.10f);
-    torso = addLimb(coords);
-    legs[0] = addLimbAtJoint(torso, 0.0f, -0.1f, 0.075f, 0.5f);
-    legs[0]->rotateLimbAboutJoint(M_PI/16.0f);
+    addLimb(coords);
+    addLimbAtJoint(body.getLimbAt(0), 0.0f, -0.1f, 0.075f, 0.5f);
+    QVector<float> vertices = body.getLimbVertices();
     vbo.create();
     vbo.bind();
-    vbo.allocate(body.getLimbVertices().constData(), body.getCount() * sizeof(float));
+    vbo.allocate(vertices.constData(), body.getVertexCount() * sizeof(float));
     //vbo.allocate(g_vertex_buffer_data, sizeof(g_vertex_buffer_data));
+}
+
+void GLWidget::rotateLimb() {
+    Limb* limb = body.getLimbAt(1);
+    limb->rotateLimbAboutJoint(M_PI/540.0f);
+    QVector<float> vertices = body.getLimbVertices();
+    vbo.allocate(vertices.constData(), body.getVertexCount() * sizeof(float));
+    update();
 }
 
 Limb* GLWidget::addLimb(float coords[4][3]) {
@@ -95,7 +101,7 @@ Limb* GLWidget::addLimb(float coords[4][3]) {
     l->setV2(coords[1][0], coords[1][1]);
     l->setV3(coords[2][0], coords[2][1]);
     l->setV4(coords[3][0], coords[3][1]);
-    body.addLimb(*l);
+    body.addLimb(l);
     limbNum++;
     return l;
 }
@@ -132,7 +138,7 @@ Limb* GLWidget::addLimbAtJoint(Limb* parent, float jointX, float jointY, float s
             l->setV4((parent->getV4() + QVector2D(scaleDiff/2.0f, 0.0f)) + QVector2D(0,scaleY));
             l->setV3((parent->getV3() - QVector2D(scaleDiff/2.0f, 0.0f)) + QVector2D(0,scaleY));
         }
-        body.addLimb(*l);
+        body.addLimb(l);
         limbNum++;
         return l;
     } else {
@@ -168,6 +174,7 @@ void GLWidget::paintGL()
         glDrawArrays(GL_TRIANGLES, i*6, 6);
     }
 
+    rotateLimb();
 }
 
 void GLWidget::resizeGL(int width, int height)

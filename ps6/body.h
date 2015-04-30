@@ -9,17 +9,19 @@ class Body
 public:
     Body();
     ~Body();
-    void addLimb(Limb limb);
+    void addLimb(Limb* limb);
     QVector<float> getLimbVertices();
-    int getCount();
+    int getVertexCount();
+    int getLimbCount();
+    Limb* getLimbAt(int index);
 
 private:
-    QVector<Limb> limbs;
-    QVector<float> limbVertices;
-    int count;
+    QVector<Limb*> limbs;
+    int limb_count;
+    int vertex_count;
 
-    void appendLimb(Limb limb);
-    void prependLimb(Limb limb);
+    void appendLimb(Limb* limb, QVector<float> &limbVertices);
+    void prependLimb(Limb* limb, QVector<float> &limbVertices);
 };
 
 #endif // BODY_H
