@@ -46,19 +46,23 @@ OBJECTS_DIR   = debug
 SOURCES       = ..\ps6\main.cpp \
 		..\ps6\glwidget.cpp \
 		..\ps6\limb.cpp \
-		..\ps6\body.cpp debug\moc_glwidget.cpp
+		..\ps6\body.cpp \
+		..\ps6\joint.cpp debug\moc_glwidget.cpp
 OBJECTS       = debug\main.obj \
 		debug\glwidget.obj \
 		debug\limb.obj \
 		debug\body.obj \
+		debug\joint.obj \
 		debug\moc_glwidget.obj
 
 DIST          =  ..\ps6\glwidget.h \
 		..\ps6\limb.h \
-		..\ps6\body.h ..\ps6\main.cpp \
+		..\ps6\body.h \
+		..\ps6\joint.h ..\ps6\main.cpp \
 		..\ps6\glwidget.cpp \
 		..\ps6\limb.cpp \
-		..\ps6\body.cpp
+		..\ps6\body.cpp \
+		..\ps6\joint.cpp
 QMAKE_TARGET  = ps6
 DESTDIR        = debug\ #avoid trailing-slash linebreak
 TARGET         = ps6.exe
@@ -147,7 +151,7 @@ dist:
 	$(ZIP) ps6.zip $(SOURCES) $(DIST) ..\ps6\ps6.pro ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\features\spec_pre.prf ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\common\shell-win32.conf ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\qconfig.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_axbase.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_axbase_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_axcontainer.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_axcontainer_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_axserver.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_axserver_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_bluetooth.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_bluetooth_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_bootstrap_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_clucene_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_concurrent.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_concurrent_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_core.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_core_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_declarative.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_declarative_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_designer.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_designer_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_designercomponents_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_enginio.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_enginio_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_gui.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_gui_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_help.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_help_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_location.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_location_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_multimedia.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_multimedia_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_multimediawidgets.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_multimediawidgets_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_network.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_network_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_nfc.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_nfc_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_opengl.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_opengl_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_openglextensions.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_openglextensions_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_platformsupport_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_positioning.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_positioning_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_printsupport.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_printsupport_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_qml.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_qml_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_qmldevtools_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_qmltest.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_qmltest_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_qtmultimediaquicktools_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_quick.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_quick_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_quickparticles_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_quickwidgets.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_quickwidgets_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_script.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_script_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_scripttools.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_scripttools_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_sensors.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_sensors_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_serialport.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_serialport_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_sql.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_sql_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_svg.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_svg_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_testlib.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_testlib_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_uitools.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_uitools_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_webchannel.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_webchannel_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_webengine.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_webengine_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_webenginecore.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_webenginecore_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_webenginewidgets.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_webenginewidgets_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_webkit.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_webkit_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_webkitwidgets.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_webkitwidgets_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_websockets.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_websockets_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_webview.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_webview_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_widgets.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_widgets_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_winextras.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_winextras_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_xml.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_xml_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_xmlpatterns.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\modules\qt_lib_xmlpatterns_private.pri ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\features\qt_functions.prf ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\features\qt_config.prf ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\features\win32\qt_config.prf ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\win32-msvc2013\qmake.conf ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\features\spec_post.prf ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\features\exclusive_builds.prf ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\features\default_pre.prf ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\features\win32\default_pre.prf ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\features\resolve_config.prf ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\features\exclusive_builds_post.prf ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\features\default_post.prf ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\features\build_pass.prf ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\features\win32\rtti.prf ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\features\precompile_header.prf ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\features\warn_on.prf ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\features\qt.prf ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\features\resources.prf ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\features\moc.prf ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\features\win32\opengl.prf ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\features\uic.prf ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\features\win32\windows.prf ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\features\testcase_targets.prf ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\features\exceptions.prf ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\features\yacc.prf ..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\mkspecs\features\lex.prf ..\ps6\ps6.pro E:/Programs/Qt/Qt5.4.0/5.4/msvc2013_64_opengl/lib/qtmaind.prl E:/Programs/Qt/Qt5.4.0/5.4/msvc2013_64_opengl/lib/Qt5Cored.prl E:/Programs/Qt/Qt5.4.0/5.4/msvc2013_64_opengl/lib/Qt5Widgetsd.prl E:/Programs/Qt/Qt5.4.0/5.4/msvc2013_64_opengl/lib/Qt5Guid.prl  NO_PCH_SOURCES RESOURCES HEADERS SOURCES OBJECTIVE_SOURCES FORMS YACCSOURCES YACCSOURCES LEXSOURCES 
 
 clean: compiler_clean 
-	-$(DEL_FILE) debug\main.obj debug\glwidget.obj debug\limb.obj debug\body.obj debug\moc_glwidget.obj
+	-$(DEL_FILE) debug\main.obj debug\glwidget.obj debug\limb.obj debug\body.obj debug\joint.obj debug\moc_glwidget.obj
 	-$(DEL_FILE) debug\ps6.exp debug\ps6.ilk debug\ps6.idb
 
 distclean: clean 
@@ -170,7 +174,7 @@ compiler_moc_header_clean:
 	-$(DEL_FILE) debug\moc_glwidget.cpp
 debug\moc_glwidget.cpp: ..\ps6\body.h \
 		..\ps6\limb.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtGui\QVector2D \
+		..\ps6\joint.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtGui\qvector2d.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qpoint.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qnamespace.h \
@@ -215,12 +219,13 @@ debug\moc_glwidget.cpp: ..\ps6\body.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qisenum.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qobjectdefs.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qobjectdefs_impl.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qmath.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtGui\QVector2D \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\QVector \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qvector.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qiterator.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qlist.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qbytearraylist.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qmath.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtWidgets\QOpenGLWidget \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtWidgets\qopenglwidget.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtWidgets\QWidget \
@@ -510,7 +515,7 @@ compiler_clean: compiler_moc_header_clean
 debug\main.obj: ..\ps6\main.cpp ..\ps6\glwidget.h \
 		..\ps6\body.h \
 		..\ps6\limb.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtGui\QVector2D \
+		..\ps6\joint.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtGui\qvector2d.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qpoint.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qnamespace.h \
@@ -555,12 +560,13 @@ debug\main.obj: ..\ps6\main.cpp ..\ps6\glwidget.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qisenum.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qobjectdefs.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qobjectdefs_impl.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qmath.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtGui\QVector2D \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\QVector \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qvector.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qiterator.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qlist.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qbytearraylist.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qmath.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtWidgets\QOpenGLWidget \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtWidgets\qopenglwidget.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtWidgets\QWidget \
@@ -835,7 +841,7 @@ debug\main.obj: ..\ps6\main.cpp ..\ps6\glwidget.h \
 debug\glwidget.obj: ..\ps6\glwidget.cpp ..\ps6\glwidget.h \
 		..\ps6\body.h \
 		..\ps6\limb.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtGui\QVector2D \
+		..\ps6\joint.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtGui\qvector2d.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qpoint.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qnamespace.h \
@@ -880,12 +886,13 @@ debug\glwidget.obj: ..\ps6\glwidget.cpp ..\ps6\glwidget.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qisenum.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qobjectdefs.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qobjectdefs_impl.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qmath.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtGui\QVector2D \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\QVector \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qvector.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qiterator.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qlist.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qbytearraylist.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qmath.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtWidgets\QOpenGLWidget \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtWidgets\qopenglwidget.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtWidgets\QWidget \
@@ -1155,7 +1162,115 @@ debug\glwidget.obj: ..\ps6\glwidget.cpp ..\ps6\glwidget.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\QTimer
 
 debug\limb.obj: ..\ps6\limb.cpp ..\ps6\limb.h \
+		..\ps6\joint.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtGui\qvector2d.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qpoint.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qnamespace.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qglobal.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qconfig.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qfeatures.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qsystemdetection.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qprocessordetection.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qcompilerdetection.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qtypeinfo.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qtypetraits.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qsysinfo.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qlogging.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qflags.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qbasicatomic.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic_bootstrap.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qgenericatomic.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic_msvc.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic_armv7.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic_armv6.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic_armv5.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic_ia64.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic_mips.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic_x86.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic_cxx11.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic_gcc.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic_unix.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qglobalstatic.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qmutex.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qnumeric.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qmetatype.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qbytearray.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qrefcount.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qarraydata.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qstring.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qchar.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qstringbuilder.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qvarlengtharray.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qcontainerfwd.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qalgorithms.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qisenum.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qobjectdefs.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qobjectdefs_impl.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtGui\QVector2D \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\QVector \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qvector.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qiterator.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qlist.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qbytearraylist.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qmath.h
+
+debug\body.obj: ..\ps6\body.cpp ..\ps6\body.h \
+		..\ps6\limb.h \
+		..\ps6\joint.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtGui\qvector2d.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qpoint.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qnamespace.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qglobal.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qconfig.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qfeatures.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qsystemdetection.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qprocessordetection.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qcompilerdetection.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qtypeinfo.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qtypetraits.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qsysinfo.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qlogging.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qflags.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qbasicatomic.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic_bootstrap.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qgenericatomic.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic_msvc.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic_armv7.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic_armv6.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic_armv5.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic_ia64.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic_mips.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic_x86.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic_cxx11.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic_gcc.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic_unix.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qglobalstatic.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qmutex.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qnumeric.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qmetatype.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qbytearray.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qrefcount.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qarraydata.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qstring.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qchar.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qstringbuilder.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qvarlengtharray.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qcontainerfwd.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qalgorithms.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qisenum.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qobjectdefs.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qobjectdefs_impl.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtGui\QVector2D \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\QVector \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qvector.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qiterator.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qlist.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qbytearraylist.h \
+		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qmath.h
+
+debug\joint.obj: ..\ps6\joint.cpp ..\ps6\joint.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtGui\qvector2d.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qpoint.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qnamespace.h \
@@ -1201,60 +1316,6 @@ debug\limb.obj: ..\ps6\limb.cpp ..\ps6\limb.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qobjectdefs.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qobjectdefs_impl.h \
 		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qmath.h
-
-debug\body.obj: ..\ps6\body.cpp ..\ps6\body.h \
-		..\ps6\limb.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtGui\QVector2D \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtGui\qvector2d.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qpoint.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qnamespace.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qglobal.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qconfig.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qfeatures.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qsystemdetection.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qprocessordetection.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qcompilerdetection.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qtypeinfo.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qtypetraits.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qsysinfo.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qlogging.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qflags.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qbasicatomic.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic_bootstrap.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qgenericatomic.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic_msvc.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic_armv7.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic_armv6.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic_armv5.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic_ia64.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic_mips.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic_x86.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic_cxx11.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic_gcc.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qatomic_unix.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qglobalstatic.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qmutex.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qnumeric.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qmetatype.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qbytearray.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qrefcount.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qarraydata.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qstring.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qchar.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qstringbuilder.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qvarlengtharray.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qcontainerfwd.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qalgorithms.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qisenum.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qobjectdefs.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qobjectdefs_impl.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qmath.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\QVector \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qvector.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qiterator.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qlist.h \
-		..\..\..\Programs\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\include\QtCore\qbytearraylist.h
 
 debug\moc_glwidget.obj: debug\moc_glwidget.cpp 
 

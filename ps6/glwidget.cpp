@@ -8,6 +8,9 @@ GLWidget::GLWidget(QWidget *parent)
     setFocusPolicy(Qt::StrongFocus);
     body = Body();
     forward_leg = Leg_Forward::LEFT;
+    ground_point = QVector2D(std::numeric_limits<float>::min(),
+                             std::numeric_limits<float>::min());
+    delta_radians = 0.0f;
 }
 
 GLWidget::~GLWidget()
@@ -80,20 +83,23 @@ void GLWidget::loadBody()
     float coords[4][3];
     Limb* l;
     moveLimb(g_vertex_buffer_data, coords, 0.0f, 0.0f, 0.0f, 0.10f);
-    addLimb(coords);
+    l = addLimb(coords);
+    l->addNullParentJoint(); //add null parent joint since this limb has no parent
     addLimbAtJoint(*body.getLimbAt(0), 0.0f, -0.1f, 0.075f, 0.30f); //thigh 1
     addLimbAtJoint(*body.getLimbAt(0), 0.0f, -0.1f, 0.075f, 0.30f); //thigh 2
     l = addLimbAtJoint(*body.getLimbAt(1), 0.0f, -0.40f, 0.075f, 0.20f); //shin 1
-    l->setMaxRot(0.0f);
-    l->setMinRot(-M_PI/4.0f);
-    l->setRotationDirection(Limb::Rotation_Direction::CW);
-    l->rotateLimbAboutJoint(M_PI/4.0f);
-    l->setRotationDirection(Limb::Rotation_Direction::CCW);
+    l->getJoint(0)->setMaxRot(0.0f);
+    l->getJoint(0)->setMinRot(-M_PI/4.0f);
+    l->getJoint(0)->setRotationDirection(Joint::Rotation_Direction::CW);
+    l->rotateLimbAboutJoint(M_PI/4.0f, 0);
+    l->getJoint(0)->setRotationDirection(Joint::Rotation_Direction::CCW);
     l = addLimbAtJoint(*body.getLimbAt(2), 0.0f, -0.40f, 0.075f, 0.20f); //shin 2
-    l->setMaxRot(0.0f);
-    l->setMinRot(-M_PI/4.0f);
-    l->setRotationDirection(Limb::Rotation_Direction::CW);
-    body.getLimbAt(2)->setRotationDirection(Limb::Rotation_Direction::CW);
+    l->getJoint(0)->setMaxRot(0.0f);
+    l->getJoint(0)->setMinRot(-M_PI/4.0f);
+    l->getJoint(0)->setRotationDirection(Joint::Rotation_Direction::CW);
+    body.getLimbAt(2)->getJoint(0)->setRotationDirection(Joint::Rotation_Direction::CW);
+    body.getLimbAt(0)->getJoint(1)->setRotationDirection(Joint::Rotation_Direction::CW);
+    ground_point = QVector2D(0.0f,-0.6f);
     QVector<float> vertices = body.getLimbVertices();
     vbo.create();
     vbo.bind();
@@ -102,29 +108,34 @@ void GLWidget::loadBody()
 }
 
 void GLWidget::animate() {
+
+    Limb* shin;
     if (forward_leg == Leg_Forward::LEFT &&
-            body.getLimbAt(1)->getCurrRot() >= body.getLimbAt(1)->getMaxRot()) {
-        body.getLimbAt(1)->setRotationDirection(Limb::Rotation_Direction::CW);
-        body.getLimbAt(2)->setRotationDirection(Limb::Rotation_Direction::CCW);
+            body.getLimbAt(1)->getJoint(0)->getCurrRot() >= body.getLimbAt(1)->getJoint(0)->getMaxRot()) {
+        body.getLimbAt(1)->getJoint(0)->setRotationDirection(Joint::Rotation_Direction::CW);
+        body.getLimbAt(2)->getJoint(0)->setRotationDirection(Joint::Rotation_Direction::CCW);
         forward_leg = Leg_Forward::RIGHT;
     } else if (forward_leg == Leg_Forward::RIGHT &&
-               body.getLimbAt(2)->getCurrRot() >= body.getLimbAt(2)->getMaxRot()) {
-           body.getLimbAt(1)->setRotationDirection(Limb::Rotation_Direction::CCW);
-           body.getLimbAt(2)->setRotationDirection(Limb::Rotation_Direction::CW);
-           forward_leg = Leg_Forward::LEFT;
+               body.getLimbAt(2)->getJoint(0)->getCurrRot() >= body.getLimbAt(2)->getJoint(0)->getMaxRot()) {
+        body.getLimbAt(1)->getJoint(0)->setRotationDirection(Joint::Rotation_Direction::CCW);
+        body.getLimbAt(2)->getJoint(0)->setRotationDirection(Joint::Rotation_Direction::CW);
+        forward_leg = Leg_Forward::LEFT;
     }
     if (forward_leg == Leg_Forward::LEFT) {
+        shin = body.getLimbAt(4);
         legForward(body.getLimbAt(1));
         legBackward(body.getLimbAt(2));
+
     } else {
+        shin = body.getLimbAt(3);
         legForward(body.getLimbAt(2));
         legBackward(body.getLimbAt(1));
     }
-    /*
-    body.getLimbAt(1)->rotateLimbAboutJoint(M_PI/540.0f);
-    body.getLimbAt(2)->rotateLimbAboutJoint(M_PI/540.0f);
 
-    */
+    ground_point = QVector2D((shin->getV1().x() + shin->getV2().x())/2.0f,
+                             (shin->getV1().y() + shin->getV2().y())/2.0f);
+    moveBody(ground_point, shin->getParent()->getJoint(0)->getCurrRot());
+
     QVector<float> vertices = body.getLimbVertices();
 
     vbo.allocate(vertices.constData(), body.getVertexCount() * sizeof(float));
@@ -133,33 +144,41 @@ void GLWidget::animate() {
 
 void GLWidget::legForward(Limb* leg) {
 
-    leg->rotateLimbAboutJoint(M_PI/810.0f);
+    leg->rotateLimbAboutJoint(M_PI/810.0f, 0);
 
-    if (leg->getCurrRot() >= 0.0f) {
-        leg->getChild()->setRotationDirection(Limb::Rotation_Direction::CCW);
-        straightenKnee(leg->getChild());
+    if (leg->getJoint(0)->getCurrRot() >= 0.0f) {
+        leg->getChildren()[0]->getJoint(0)->setRotationDirection(Joint::Rotation_Direction::CCW);
+        straightenKnee(leg->getChildren()[0]);
     }
-    if (leg->getCurrRot() <= 0.0f) {
-        leg->getChild()->setRotationDirection(Limb::Rotation_Direction::CW);
-        bendKnee(leg->getChild());
+    if (leg->getJoint(0)->getCurrRot() <= 0.0f) {
+        leg->getChildren()[0]->getJoint(0)->setRotationDirection(Joint::Rotation_Direction::CW);
+        bendKnee(leg->getChildren()[0]);
     }
 
 }
 
 void GLWidget::legBackward(Limb* leg) {
-    leg->rotateLimbAboutJoint(M_PI/810.f);
-    /*
-    if (leg->getCurrRot() <= 0.0f) {
-        bendKnee(leg->getChild());
-    }*/
+    leg->rotateLimbAboutJoint(M_PI/810.f, 0);
 }
 
 void GLWidget::bendKnee(Limb* shin) {
-    shin->rotateLimbAboutJoint(M_PI/270.0f);
+    shin->rotateLimbAboutJoint(M_PI/270.0f, 0);
 }
 
 void GLWidget::straightenKnee(Limb* shin) {
-    shin->rotateLimbAboutJoint(M_PI/270.0f);
+    shin->rotateLimbAboutJoint(M_PI/270.0f, 0);
+}
+
+void GLWidget::moveBody(QVector2D ground_point, float radians) {
+    //delta_radians = radians - delta_radians;
+    body.getLimbAt(0)->translateLimbY(ground_point, 0.6f, -0.1f, 0);
+    body.getLimbAt(1)->translateLimbY(ground_point, 0.6f, -0.4f,0);
+    body.getLimbAt(2)->translateLimbY(ground_point, 0.6f, -0.4f,0);
+   // body.getLimbAt(0)->translateLimbX(M_PI/810.0f);
+   // body.getLimbAt(1)->translateLimbX(M_PI/810.0f, 0);
+   // body.getLimbAt(2)->translateLimbX(M_PI/810.0f, 0);
+   // body.getLimbAt(3)->translateLimbX(M_PI/810.0f, 0);
+    //body.getLimbAt(4)->translateLimbX(M_PI/810.0f, 0);
 }
 
 Limb* GLWidget::addLimb(float coords[4][3]) {
@@ -175,36 +194,42 @@ Limb* GLWidget::addLimb(float coords[4][3]) {
 
 Limb* GLWidget::addLimbAtJoint(Limb &parent, float jointX, float jointY, float scaleX, float scaleY) {
     float scaleDiff;
-    Limb::Joint_Side js = parent.jointSide(jointX, jointY);
-    if (js != Limb::Joint_Side::NON_JOINT) {
+    Joint::Joint_Side js = parent.getJointSide(jointX, jointY);
+    if (js != Joint::Joint_Side::NON_JOINT) {
         Limb* l = new Limb();
-        parent.setChild(l);
+        parent.getChildren().append(l);
+        parent.addChildJoint(jointX, jointY);
+        parent.getJoint(parent.getJoints().count() - 1)->setJointSide(js);
         l->setParent(&parent);
-        l->setJoint(jointX, jointY);
-        if (js == Limb::Joint_Side::LEFT) {
+        l->addParentJoint(jointX, jointY);
+        if (js == Joint::Joint_Side::LEFT) {
             scaleDiff = (parent.getV4().y() - parent.getV1().y()) - scaleY;
             l->setV2(parent.getV1() + QVector2D(0.0f, scaleDiff/2.0f));
             l->setV3(parent.getV4() - QVector2D(0.0f, scaleDiff/2.0f));
             l->setV1((parent.getV1() + QVector2D(0.0f, scaleDiff/2.0f)) - QVector2D(scaleX,0));
             l->setV4((parent.getV4() - QVector2D(0.0f, scaleDiff/2.0f)) - QVector2D(scaleX,0));
-        } else if (js ==  Limb::Joint_Side::RIGHT) {
+            l->getJoint(l->getJoints().count() - 1)->setJointSide(Joint::Joint_Side::RIGHT);
+        } else if (js ==  Joint::Joint_Side::RIGHT) {
             scaleDiff = (parent.getV3().y() - parent.getV2().y()) - scaleY;
             l->setV1(parent.getV2() + QVector2D(0.0f, scaleDiff/2.0f));
             l->setV4(parent.getV3() - QVector2D(0.0f, scaleDiff/2.0f));
             l->setV2((parent.getV2() + QVector2D(0.0f, scaleDiff/2.0f)) + QVector2D(scaleX,0));
             l->setV3((parent.getV3() - QVector2D(0.0f, scaleDiff/2.0f)) + QVector2D(scaleX,0));
-        } else if (js == Limb::Joint_Side::BOTTOM) {
+            l->getJoint(l->getJoints().count() - 1)->setJointSide(Joint::Joint_Side::LEFT);
+        } else if (js == Joint::Joint_Side::BOTTOM) {
             scaleDiff = (parent.getV2().x() - parent.getV1().x()) - scaleX;
             l->setV4(parent.getV1() + QVector2D(scaleDiff/2.0f, 0.0f));
             l->setV3(parent.getV2() - QVector2D(scaleDiff/2.0f, 0.0f));
             l->setV1((parent.getV1() + QVector2D(scaleDiff/2.0f, 0.0f)) - QVector2D(0,scaleY));
             l->setV2((parent.getV2() - QVector2D(scaleDiff/2.0f, 0.0f)) - QVector2D(0,scaleY));
+            l->getJoint(l->getJoints().count() - 1)->setJointSide(Joint::Joint_Side::TOP);
         } else {
             scaleDiff = (parent.getV3().x() - parent.getV4().x()) - scaleX;
             l->setV1(parent.getV4() + QVector2D(scaleDiff/2.0f, 0.0f));
             l->setV2(parent.getV3() - QVector2D(scaleDiff/2.0f, 0.0f));
             l->setV4((parent.getV4() + QVector2D(scaleDiff/2.0f, 0.0f)) + QVector2D(0,scaleY));
             l->setV3((parent.getV3() - QVector2D(scaleDiff/2.0f, 0.0f)) + QVector2D(0,scaleY));
+            l->getJoint(l->getJoints().count() - 1)->setJointSide(Joint::Joint_Side::BOTTOM);
         }
         body.addLimb(l);
         limbNum++;

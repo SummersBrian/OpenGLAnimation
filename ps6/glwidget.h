@@ -39,6 +39,7 @@ private:
     void legBackward(Limb* leg);
     void bendKnee(Limb* shin);
     void straightenKnee(Limb* shin);
+    void moveBody(QVector2D ground_point, float radians);
     void moveLimb(const float coords[4][3], float (&returnCoords)[4][3], float x, float y, float z, float scale);
     Limb* addLimb(float coords[4][3]);
     Limb* addLimbAtJoint(Limb &parent, float jointX, float jointY, float scaleX, float scaleY);
@@ -53,6 +54,8 @@ private:
     int limbNum;
     Body body;
     Leg_Forward forward_leg;
+    QVector2D ground_point;
+    float delta_radians;
 
 };
 

@@ -4,32 +4,12 @@
 
 Limb::Limb() {
     parent = NULL;
-    child = NULL;
+    children = QVector<Limb*>();
     //joint = NULL;
     v1 = QVector2D();
     v2 = QVector2D();
     v3 = QVector2D();
     v4 = QVector2D();
-    curr_rot = 0.0f;
-    rotation_direction = Rotation_Direction::CCW;
-    max_rot = M_PI/12.0f;
-    min_rot = -M_PI/12.0f;
-}
-
-Limb::Limb(Limb *parent, QVector2D joint, QVector2D jointV1, QVector2D jointV2) {
-    this->parent = parent;
-    parent->child = this;
-    this->joint = joint;
-    v1 = QVector2D();
-    v1.setX(jointV1.x());
-    v1.setY(jointV2.y());
-    v2 = QVector2D();
-    v2.setX(jointV1.x());
-    v2.setY(jointV2.y());
-    v3 = QVector2D();
-    v4 = QVector2D();
-    curr_rot = 0.0f;
-    rotation_direction = Rotation_Direction::CCW;
 }
 
 Limb::~Limb(){
@@ -56,20 +36,52 @@ void Limb::setV4(float x, float y) {
     v4.setY(y);
 }
 
-void Limb::setJoint(float x, float y) {
-    this->joint = QVector2D(x,y);
+bool Limb::addNullParentJoint() {
+    if (joints.count() != 0) {
+        return false;
+    } else {
+        joints.append(NULL);
+        return true;
+    }
+}
+
+bool Limb::addParentJoint(float x, float y) {
+    if (joints.count() != 0) {
+        return false;
+    } else {
+        joints.append(new Joint(x,y));
+        return true;
+    }
+}
+
+bool Limb::addChildJoint(float x, float y) {
+    if (joints.count() > 0) {
+        joints.append(new Joint(x,y));
+        return true;
+    } else {
+        return false;
+
+    }
+}
+
+QVector<Joint*> &Limb::getJoints() {
+    return joints;
 }
 
 void Limb::setParent(Limb *parent) {
     this->parent = parent;
 }
 
-void Limb::setChild(Limb *child) {
-    this->child = child;
+Limb* &Limb::getParent() {
+    return parent;
 }
 
-Limb* Limb::getChild() {
-    return child;
+void Limb::addChild(Limb *child) {
+    children.append(child);
+}
+
+QVector<Limb *> &Limb::getChildren() {
+    return children;
 }
 
 void Limb::setV1(QVector2D v) {
@@ -108,45 +120,53 @@ QVector2D Limb::getV4() {
     return v4;
 }
 
-Limb::Joint_Side Limb::jointSide(float x, float y) {
+Joint* &Limb::getJoint(int index) {
+    return joints[index];
+}
+
+void Limb::setJoint(Joint* joint, int index) {
+    joints.replace(index,joint);
+}
+
+Joint::Joint_Side Limb::getJointSide(float x, float y) {
     if (v1.x() == x && v4.x() == x) {
         if (y == ((v4.y() - v1.y()) / 2.0f) + v1.y()) {
-            return LEFT;
+            return Joint::Joint_Side::LEFT;
         }
     } else if (v2.x() == x && v3.x() == x) {
         if (y == ((v3.y() - v2.y()) / 2.0f) + v2.y()) {
-            return RIGHT;
+            return Joint::Joint_Side::RIGHT;
         }
     } else if (v1.y() == y && v2.y() == y) {
         if (x == ((v2.x() - v1.x()) / 2.0f) + v1.x()) {
-            return BOTTOM;
+            return Joint::Joint_Side::BOTTOM;
         }
     } else if (v3.y() == y && v4.y() == y) {
         if (x == ((v3.x() - v4.x()) / 2.0f) + v4.x()) {
-            return TOP;
+            return Joint::Joint_Side::TOP;
         }
     }
-    return NON_JOINT;
+    return Joint::Joint_Side::NON_JOINT;
 }
 
-void Limb::rotateLimbAboutJoint(float radians) {
-
-    if (rotation_direction == Rotation_Direction::CCW) {
-        if ( (curr_rot + radians) > max_rot) {
-            radians = max_rot - curr_rot;
+void Limb::rotateLimbAboutJoint(float radians, int index) {
+    Joint* joint = getJoint(index);
+    if (joint->getRotationDirection() ==  Joint::Rotation_Direction::CCW) {
+        if ( (joint->getCurrRot() + radians) > joint->getMaxRot()) {
+            radians = joint->getMaxRot() - joint->getCurrRot();
         }
     }
-    if (rotation_direction == Rotation_Direction::CW) {
-       radians *= -1;
+    if (joint->getRotationDirection() == Joint::Rotation_Direction::CW) {
+        radians *= -1;
     }
 
     QVector2D vec1, vec2, vec3, vec4;
     float x_prime, y_prime;
 
-    vec1 = v1 - joint;
-    vec2 = v2 - joint;
-    vec3 = v3 - joint;
-    vec4 = v4 - joint;
+    vec1 = v1 - joint->getPosition();
+    vec2 = v2 - joint->getPosition();
+    vec3 = v3 - joint->getPosition();
+    vec4 = v4 - joint->getPosition();
 
     //x' = cos(theta) * x - sin(theta) * y; y' = sin(theta) * x + cos(theta) * y;
     x_prime = qCos(radians) * vec1.x() - qSin(radians) * vec1.y();
@@ -171,37 +191,40 @@ void Limb::rotateLimbAboutJoint(float radians) {
 
     v1.setX(vec1.x());
     v1.setY(vec1.y());
-    v1 = v1 + joint;
+    v1 = v1 + joint->getPosition();
 
     v2.setX(vec2.x());
     v2.setY(vec2.y());
-    v2 = v2 + joint;
+    v2 = v2 + joint->getPosition();
 
     v3.setX(vec3.x());
     v3.setY(vec3.y());
-    v3 = v3 + joint;
+    v3 = v3 + joint->getPosition();
 
     v4.setX(vec4.x());
     v4.setY(vec4.y());
-    v4 = v4 + joint;
+    v4 = v4 + joint->getPosition();
 
-    if (child != NULL) {
-        child->rotateLimbAboutJoint(radians, joint);
+    if (!children.empty()) {
+        for(int i = 0; i < children.count() ; i++) {
+            Limb* child = children[i];
+            child->rotateLimbAboutJoint(radians, joint->getPosition(), 0);
+        }
     }
 
-    curr_rot += radians;
+    joint->setCurrRot(joint->getCurrRot() + radians);
 }
 
-void Limb::rotateLimbAboutJoint(float radians, QVector2D joint) {
-
+void Limb::rotateLimbAboutJoint(float radians, QVector2D oJoint, int index) {
+    Joint* joint = getJoint(index);
     QVector2D vec1, vec2, vec3, vec4, vec5;
     float x_prime, y_prime;
 
-    vec1 = v1 - joint;
-    vec2 = v2 - joint;
-    vec3 = v3 - joint;
-    vec4 = v4 - joint;
-    vec5 = this->joint - joint;
+    vec1 = v1 - oJoint;
+    vec2 = v2 - oJoint;
+    vec3 = v3 - oJoint;
+    vec4 = v4 - oJoint;
+    vec5 = joint->getPosition() - oJoint;
 
     //x' = cos(theta) * x - sin(theta) * y; y' = sin(theta) * x + cos(theta) * y;
     x_prime = qCos(radians) * vec1.x() - qSin(radians) * vec1.y();
@@ -231,57 +254,59 @@ void Limb::rotateLimbAboutJoint(float radians, QVector2D joint) {
 
     v1.setX(vec1.x());
     v1.setY(vec1.y());
-    v1 = v1 + joint;
+    v1 = v1 + oJoint;
 
     v2.setX(vec2.x());
     v2.setY(vec2.y());
-    v2 = v2 + joint;
+    v2 = v2 + oJoint;
 
     v3.setX(vec3.x());
     v3.setY(vec3.y());
-    v3 = v3 + joint;
+    v3 = v3 + oJoint;
 
     v4.setX(vec4.x());
     v4.setY(vec4.y());
-    v4 = v4 + joint;
+    v4 = v4 + oJoint;
 
-    this->joint.setX(vec5.x());
-    this->joint.setY(vec5.y());
-    this->joint = this->joint + joint;
+    joint->getPosition().setX(vec5.x() + oJoint.x());
+    joint->getPosition().setY(vec5.y() + oJoint.y());
 
-    if (child != NULL) {
-        child->rotateLimbAboutJoint(radians, joint);
+    if (!children.empty()) {
+        for(int i = 0; i < children.count() ; i++) {
+            Limb* child = children[i];
+            child->rotateLimbAboutJoint(radians, oJoint, 0);
+        }
     }
 }
 
-void Limb::setCurrRot(float radians) {
-    curr_rot = radians;
+void Limb::translateLimbX(float radians, int index) {
+    Joint* joint = getJoint(index);
+    // v1.setX(v1.x() + qAbs(v1.y()) * qTan(radians));
+    // v2.setX(v2.x() + qAbs(v2.y()) * qTan(radians));
+    //v3.setX(v3.x() + qAbs(v3.y()) * qTan(radians));
+    // v4.setX(v4.x() + qAbs(v4.y()) * qTan(radians));
+    joint->getPosition().setX(joint->getPosition().x() + qAbs(joint->getPosition().y()) * qTan(radians));
+
 }
 
-float Limb::getCurrRot() {
-    return curr_rot;
-}
+void Limb::translateLimbY(QVector2D ground_point, float hypo_length, float startY, int index) {
+    float yScale = v4.y() - v1.y();
+    float val = sqrt(hypo_length * hypo_length - ground_point.x() * ground_point.x());
 
-float Limb::getMaxRot() {
-    return max_rot;
-}
+    v1.setY(startY - (hypo_length - sqrt((hypo_length*hypo_length) - (ground_point.x() * ground_point.x()))));
+    v2.setY(startY - (hypo_length - sqrt((hypo_length*hypo_length) - (ground_point.x() * ground_point.x()))));
+    v3.setY(v2.y() + yScale);
+    v4.setY(v1.y() + yScale);
 
-void Limb::setMaxRot(float radians) {
-    max_rot = radians;
-}
+    if (getJoint(0) != NULL && getJoints().count() > 1) {
 
-float Limb::getMinRot() {
-    return min_rot;
-}
+        getJoint(0)->setPosition(getJoint(0)->getPosition().x(), v3.y());
+        getJoint(1)->setPosition(getJoint(1)->getPosition().x(), v1.y());
 
-void Limb::setMinRot(float radians) {
-    min_rot = radians;
-}
+    } else {
+        getJoint(1)->setPosition(getJoint(1)->getPosition().x(),
+                                 v1.y());
+    }
 
-void Limb::setRotationDirection(Rotation_Direction rotation_direction) {
-    this->rotation_direction = rotation_direction;
-}
 
-Limb::Rotation_Direction Limb::getRotationDirection() {
-    return rotation_direction;
 }
