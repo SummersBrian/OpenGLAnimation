@@ -23,7 +23,7 @@ class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 public:
     explicit GLWidget(QWidget *parent = 0);
     ~GLWidget();
-    enum Leg_Forward {LEFT,RIGHT};
+    //enum Leg_Forward {LEFT,RIGHT};
 
 protected:
     void initializeGL() Q_DECL_OVERRIDE;
@@ -31,6 +31,7 @@ protected:
     void paintGL() Q_DECL_OVERRIDE;
 
     void initShaders();
+    void keyPressEvent(QKeyEvent * event);
 
 private:
     void loadBody();
@@ -53,9 +54,10 @@ private:
     QMatrix4x4 model;
     int limbNum;
     Body body;
-    Leg_Forward forward_leg;
+    //Leg_Forward forward_leg;
     QVector2D ground_point;
     float delta_radians;
+    bool waitForInput;
 
 };
 

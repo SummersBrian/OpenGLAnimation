@@ -4,8 +4,8 @@
 Joint::Joint(float x, float y)
 {
     curr_rot = 0.0f;
-    max_rot = M_PI/12.0f;
-    min_rot = -M_PI/12.0f;
+    max_rot = M_PI/6.0f;
+    min_rot = -M_PI/6.0f;
     position = QVector2D(x,y);
     rotation_direction = Rotation_Direction::CCW;
     joint_side = Joint_Side::NON_JOINT;

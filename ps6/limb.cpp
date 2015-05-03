@@ -205,12 +205,14 @@ void Limb::rotateLimbAboutJoint(float radians, int index) {
     v4.setY(vec4.y());
     v4 = v4 + joint->getPosition();
 
+    /*
     if (!children.empty()) {
         for(int i = 0; i < children.count() ; i++) {
             Limb* child = children[i];
             child->rotateLimbAboutJoint(radians, joint->getPosition(), 0);
         }
     }
+*/
 
     joint->setCurrRot(joint->getCurrRot() + radians);
 }
@@ -271,12 +273,81 @@ void Limb::rotateLimbAboutJoint(float radians, QVector2D oJoint, int index) {
     joint->getPosition().setX(vec5.x() + oJoint.x());
     joint->getPosition().setY(vec5.y() + oJoint.y());
 
+    /*
     if (!children.empty()) {
         for(int i = 0; i < children.count() ; i++) {
             Limb* child = children[i];
             child->rotateLimbAboutJoint(radians, oJoint, 0);
         }
     }
+    */
+}
+
+void Limb::rotateLimbAboutJoint(float radians, QVector2D oJoint, Joint::Rotation_Direction rotation_dir) {
+    QVector2D vec1, vec2, vec3, vec4, vec5;
+    float x_prime, y_prime;
+
+    if (rotation_dir == Joint::Rotation_Direction::CW) {
+        radians *= -1;
+    }
+
+    vec1 = v1 - oJoint;
+    vec2 = v2 - oJoint;
+    vec3 = v3 - oJoint;
+    vec4 = v4 - oJoint;
+
+    //x' = cos(theta) * x - sin(theta) * y; y' = sin(theta) * x + cos(theta) * y;
+    x_prime = qCos(radians) * vec1.x() - qSin(radians) * vec1.y();
+    y_prime = qSin(radians) * vec1.x() + qCos(radians) * vec1.y();
+    vec1.setX(x_prime);
+    vec1.setY(y_prime);
+
+    x_prime = qCos(radians) * vec2.x() - qSin(radians) * vec2.y();
+    y_prime = qSin(radians) * vec2.x() + qCos(radians) * vec2.y();
+    vec2.setX(x_prime);
+    vec2.setY(y_prime);
+
+    x_prime = qCos(radians) * vec3.x() - qSin(radians) * vec3.y();
+    y_prime = qSin(radians) * vec3.x() + qCos(radians) * vec3.y();
+    vec3.setX(x_prime);
+    vec3.setY(y_prime);
+
+    x_prime = qCos(radians) * vec4.x() - qSin(radians) * vec4.y();
+    y_prime = qSin(radians) * vec4.x() + qCos(radians) * vec4.y();
+    vec4.setX(x_prime);
+    vec4.setY(y_prime);
+
+    v1.setX(vec1.x());
+    v1.setY(vec1.y());
+    v1 = v1 + oJoint;
+
+    v2.setX(vec2.x());
+    v2.setY(vec2.y());
+    v2 = v2 + oJoint;
+
+    v3.setX(vec3.x());
+    v3.setY(vec3.y());
+    v3 = v3 + oJoint;
+
+    v4.setX(vec4.x());
+    v4.setY(vec4.y());
+    v4 = v4 + oJoint;
+
+
+    for (int i = 0; i < joints.count(); i++) {
+        if (joints[i] != NULL) {
+            vec5 = joints[i]->getPosition() - oJoint;
+
+            x_prime = qCos(radians) * vec5.x() - qSin(radians) * vec5.y();
+            y_prime = qSin(radians) * vec5.x() + qCos(radians) * vec5.y();
+            vec5.setX(x_prime);
+            vec5.setY(y_prime);
+
+            joints[i]->setPosition(vec5.x() + oJoint.x(), vec5.y() + oJoint.y());
+        }
+    }
+
+
 }
 
 void Limb::translateLimbX(float radians, int index) {
@@ -289,24 +360,37 @@ void Limb::translateLimbX(float radians, int index) {
 
 }
 
-void Limb::translateLimbY(QVector2D ground_point, float hypo_length, float startY, int index) {
-    float yScale = v4.y() - v1.y();
-    float val = sqrt(hypo_length * hypo_length - ground_point.x() * ground_point.x());
-
-    v1.setY(startY - (hypo_length - sqrt((hypo_length*hypo_length) - (ground_point.x() * ground_point.x()))));
-    v2.setY(startY - (hypo_length - sqrt((hypo_length*hypo_length) - (ground_point.x() * ground_point.x()))));
-    v3.setY(v2.y() + yScale);
-    v4.setY(v1.y() + yScale);
-
-    if (getJoint(0) != NULL && getJoints().count() > 1) {
-
-        getJoint(0)->setPosition(getJoint(0)->getPosition().x(), v3.y());
-        getJoint(1)->setPosition(getJoint(1)->getPosition().x(), v1.y());
-
+void Limb::translateLimbX(float xVal) {
+    //float xVal = v1.y() * qTan(radians);
+    v1.setX(v1.x() + xVal);
+    v2.setX(v2.x() + xVal);
+    v3.setX(v3.x() + xVal);
+    v4.setX(v4.x() + xVal);
+    if (joints[0] != NULL) {
+        for (int i = 0; i < joints.count(); i++) {
+            Joint* joint = joints[i];
+            joint->setPosition(joint->getPosition().x() + xVal, joint->getPosition().y());
+        }
     } else {
-        getJoint(1)->setPosition(getJoint(1)->getPosition().x(),
-                                 v1.y());
+        joints[1]->setPosition(joints[1]->getPosition().x() + xVal, joints[1]->getPosition().y());
     }
+}
 
+void Limb::translateLimbY(float yVal) {
+    v1.setY(v1.y() + yVal);
+    v2.setY(v2.y() + yVal);
+    v3.setY(v3.y() + yVal);
+    v4.setY(v4.y() + yVal);
+    if (joints[0] != NULL) {
+        for (int i = 0; i < joints.count(); i++) {
+            Joint* joint = joints[i];
+            joint->setPosition(joint->getPosition().x(), joint->getPosition().y() + yVal);
+        }
+    } else {
+        joints[1]->setPosition(joints[1]->getPosition().x(), joints[1]->getPosition().y() + yVal);
+    }
+}
+
+void Limb::foot_grounded(QVector2D midfoot) {
 
 }

@@ -41,8 +41,11 @@ public:
 
     void rotateLimbAboutJoint(float radians, int index);
     void rotateLimbAboutJoint(float radians, QVector2D joint, int index);
+    void rotateLimbAboutJoint(float radians, QVector2D joint, Joint::Rotation_Direction rotation_dir);
     void translateLimbX(float radians, int index);
-    void translateLimbY(QVector2D ground_point, float hypo_length, float startY, int index);
+    void translateLimbX(float xVal);
+    void translateLimbY(float yVal);
+    void foot_grounded(QVector2D midfoot);
 
 private:
     QVector2D v1;

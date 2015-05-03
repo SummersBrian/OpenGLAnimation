@@ -7,10 +7,11 @@ GLWidget::GLWidget(QWidget *parent)
 
     setFocusPolicy(Qt::StrongFocus);
     body = Body();
-    forward_leg = Leg_Forward::LEFT;
+    //forward_leg = Leg_Forward::LEFT;
     ground_point = QVector2D(std::numeric_limits<float>::min(),
                              std::numeric_limits<float>::min());
     delta_radians = 0.0f;
+    waitForInput = true;
 }
 
 GLWidget::~GLWidget()
@@ -82,18 +83,18 @@ void GLWidget::loadBody()
     };
     float coords[4][3];
     Limb* l;
-    moveLimb(g_vertex_buffer_data, coords, 0.0f, 0.0f, 0.0f, 0.10f);
+    moveLimb(g_vertex_buffer_data, coords, -8.0f, 0.0f, 0.0f, 0.10f);
     l = addLimb(coords);
     l->addNullParentJoint(); //add null parent joint since this limb has no parent
-    addLimbAtJoint(*body.getLimbAt(0), 0.0f, -0.1f, 0.075f, 0.30f); //thigh 1
-    addLimbAtJoint(*body.getLimbAt(0), 0.0f, -0.1f, 0.075f, 0.30f); //thigh 2
-    l = addLimbAtJoint(*body.getLimbAt(1), 0.0f, -0.40f, 0.075f, 0.20f); //shin 1
+    addLimbAtJoint(*body.getLimbAt(0), -0.8f, -0.1f, 0.075f, 0.30f); //thigh 1
+    addLimbAtJoint(*body.getLimbAt(0), -0.8f, -0.1f, 0.075f, 0.30f); //thigh 2
+    l = addLimbAtJoint(*body.getLimbAt(1), -0.8f, -0.40f, 0.075f, 0.20f); //shin 1
     l->getJoint(0)->setMaxRot(0.0f);
     l->getJoint(0)->setMinRot(-M_PI/4.0f);
     l->getJoint(0)->setRotationDirection(Joint::Rotation_Direction::CW);
     l->rotateLimbAboutJoint(M_PI/4.0f, 0);
     l->getJoint(0)->setRotationDirection(Joint::Rotation_Direction::CCW);
-    l = addLimbAtJoint(*body.getLimbAt(2), 0.0f, -0.40f, 0.075f, 0.20f); //shin 2
+    l = addLimbAtJoint(*body.getLimbAt(2), -0.8f, -0.40f, 0.075f, 0.20f); //shin 2
     l->getJoint(0)->setMaxRot(0.0f);
     l->getJoint(0)->setMinRot(-M_PI/4.0f);
     l->getJoint(0)->setRotationDirection(Joint::Rotation_Direction::CW);
@@ -109,37 +110,15 @@ void GLWidget::loadBody()
 
 void GLWidget::animate() {
 
-    Limb* shin;
-    if (forward_leg == Leg_Forward::LEFT &&
-            body.getLimbAt(1)->getJoint(0)->getCurrRot() >= body.getLimbAt(1)->getJoint(0)->getMaxRot()) {
-        body.getLimbAt(1)->getJoint(0)->setRotationDirection(Joint::Rotation_Direction::CW);
-        body.getLimbAt(2)->getJoint(0)->setRotationDirection(Joint::Rotation_Direction::CCW);
-        forward_leg = Leg_Forward::RIGHT;
-    } else if (forward_leg == Leg_Forward::RIGHT &&
-               body.getLimbAt(2)->getJoint(0)->getCurrRot() >= body.getLimbAt(2)->getJoint(0)->getMaxRot()) {
-        body.getLimbAt(1)->getJoint(0)->setRotationDirection(Joint::Rotation_Direction::CCW);
-        body.getLimbAt(2)->getJoint(0)->setRotationDirection(Joint::Rotation_Direction::CW);
-        forward_leg = Leg_Forward::LEFT;
+    if (!waitForInput) {
+        body.moveForward();
+
+        QVector<float> vertices = body.getLimbVertices();
+
+        vbo.allocate(vertices.constData(), body.getVertexCount() * sizeof(float));
     }
-    if (forward_leg == Leg_Forward::LEFT) {
-        shin = body.getLimbAt(4);
-        legForward(body.getLimbAt(1));
-        legBackward(body.getLimbAt(2));
-
-    } else {
-        shin = body.getLimbAt(3);
-        legForward(body.getLimbAt(2));
-        legBackward(body.getLimbAt(1));
-    }
-
-    ground_point = QVector2D((shin->getV1().x() + shin->getV2().x())/2.0f,
-                             (shin->getV1().y() + shin->getV2().y())/2.0f);
-    moveBody(ground_point, shin->getParent()->getJoint(0)->getCurrRot());
-
-    QVector<float> vertices = body.getLimbVertices();
-
-    vbo.allocate(vertices.constData(), body.getVertexCount() * sizeof(float));
     update();
+
 }
 
 void GLWidget::legForward(Limb* leg) {
@@ -170,15 +149,7 @@ void GLWidget::straightenKnee(Limb* shin) {
 }
 
 void GLWidget::moveBody(QVector2D ground_point, float radians) {
-    //delta_radians = radians - delta_radians;
-    body.getLimbAt(0)->translateLimbY(ground_point, 0.6f, -0.1f, 0);
-    body.getLimbAt(1)->translateLimbY(ground_point, 0.6f, -0.4f,0);
-    body.getLimbAt(2)->translateLimbY(ground_point, 0.6f, -0.4f,0);
-   // body.getLimbAt(0)->translateLimbX(M_PI/810.0f);
-   // body.getLimbAt(1)->translateLimbX(M_PI/810.0f, 0);
-   // body.getLimbAt(2)->translateLimbX(M_PI/810.0f, 0);
-   // body.getLimbAt(3)->translateLimbX(M_PI/810.0f, 0);
-    //body.getLimbAt(4)->translateLimbX(M_PI/810.0f, 0);
+
 }
 
 Limb* GLWidget::addLimb(float coords[4][3]) {
@@ -276,6 +247,16 @@ void GLWidget::resizeGL(int width, int height)
 {
     int side = qMin(width, height);
     glViewport((width - side) / 2, (height - side) / 2, side, side);
+}
+
+void GLWidget::keyPressEvent(QKeyEvent *event) {
+    if (event->key() == Qt::Key_Space) {
+        if (waitForInput) {
+            waitForInput = false;
+        } else {
+            waitForInput = true;
+        }
+    }
 }
 
 
